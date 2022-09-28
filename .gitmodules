@@ -1,0 +1,3 @@
+[submodule "fmsolvr"]
+	path = src/gromacs/fmm/fmsolvr
+	url = git@fmsolvr.fz-juelich.de:fmsolvr

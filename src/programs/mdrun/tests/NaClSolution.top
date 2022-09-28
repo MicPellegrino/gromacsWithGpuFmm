@@ -1,0 +1,44 @@
+#define _FF_GROMACS
+
+[ defaults ]
+; nbfunc	comb-rule	gen-pairs	fudgeLJ	fudgeQQ
+  1		1		no		1.0	1.0
+
+[ atomtypes ]
+;name        mass      charge   ptype            c6           c12
+   OW    15.99940    0.000     A  0.0026173456  2.634129e-06
+   H      1.00800    0.000     A           0           0
+;  NA     0.000      0.000     A  7.2063121e-05  2.1025e-08
+;  CL     0.000      0.000     A  0.01380625  0.0001069156
+   NA     0.000      0.000     A  2.768257e-04  5.986913e-08
+   CL     0.000      0.000     A  0.01364187  9.898969e-05
+
+[ nonbond_params ]
+ ; i    j func          c6           c12
+   NA  OW    1 0.000638403   2.97839e-07
+
+
+[ moleculetype ]
+; name  nrexcl
+Na      0
+
+[ atoms ]
+; id    at type res nr  residu name     at name  cg nr  charge   mass
+1       NA      1       NA              NA       1      1        22.9898
+
+[ moleculetype ]
+; name  nrexcl
+Cl      0
+
+[ atoms ]
+1       CL      1       CL              CL       1      -1       35.45300
+
+#include "gromos43a1.ff/spce.itp"
+
+[ system ]
+40 Na and 40 Cl in SPC water
+
+[ molecules ]
+Na     40
+Cl     40
+SOL  2220

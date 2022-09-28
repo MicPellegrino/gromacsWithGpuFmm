@@ -1,0 +1,29 @@
+; Include forcefield parameters
+#include "amber03.ff/forcefield.itp"
+
+[ moleculetype ]
+; Name            nrexcl
+NA                 3
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr     charge       mass  typeB    chargeB      massB
+; residue   1 Na  rtp NA   q +1.0
+     1         Na      1     Na     Na      1          1      22.99
+
+[ moleculetype ]
+; Name            nrexcl
+CL                 3
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr     charge       mass  typeB    chargeB      massB
+; residue   1 Cl  rtp CL   q -1.0
+     1         Cl      1     Cl     Cl      8         -1      35.45
+
+[ system ]
+; Name
+NaCl51
+
+[ molecules ]
+; Compound        #mols
+NA                 51
+CL                 51

@@ -1,0 +1,29 @@
+; Include forcefield parameters
+#include "amber99sb.ff/forcefield.itp"
+
+; Include chain topologies
+#include "AKE.itp"
+#include "AKE_ion.itp"
+
+; Include water topology
+#include "amber99sb.ff/tip3p.itp"
+
+#ifdef POSRES_WATER
+; Position restraint for each water oxygen
+[ position_restraints ]
+;  i funct       fcx        fcy        fcz
+   1    1       1000       1000       1000
+#endif
+
+; Include topology for ions
+#include "amber99sb.ff/ions.itp"
+
+[ system ]
+; Name
+Gallium Rubidium Oxygen Manganese Argon Carbon Silicon in water
+
+[ molecules ]
+; Compound        #mols
+Protein             1
+Ion2                1
+

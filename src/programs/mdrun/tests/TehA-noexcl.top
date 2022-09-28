@@ -1,0 +1,73 @@
+;
+;	This '.top' file was simplified manually from a pdb2gmx generated file 
+;	By user: tullman (506382)
+;	On host: tullman
+;	At date: Thu Mar 10 2016
+;
+;	This is a standalone topology file
+;
+;	The initial topology was generated using program:
+;	pdb2gmx_d - VERSION 4.6.5
+;
+;	Command line was:
+;	pdb2gmx_d -f input_sRTUct.gro -o output_sRTUct.gro -q processed_input_sRTUct.gro -i posre.itp -p topol.top -n index.ndx -ff charmm36 -water tip4p -norenum -vsite aromatics 
+;
+
+; Include forcefield parameters
+#include "charmm27.ff/forcefield.itp"
+
+; should normally be added to ffbonded.itp in the force field directory, but adding it here
+; lets the terst case run with the charmm27.ff as distributed with GROMACS, RTU Apr 2016
+[ constrainttypes ]
+; this section is copied from OPLS. In theory we could recalculate
+; optimal geometries from charmm values, but since practical equilibrium
+; geometries do not correspond exactly to these values anyway it is not
+; worth the effort...
+#ifdef HEAVY_H
+; account for larger inertia with heavy hydrogens
+; constraints for the rigid NH3 groups
+MNH3    CTL2   2    0.191406 ; for lipid v-sites, RTU, Feb 2014
+; constraints for rigid ch3
+MCH3       C   2    0.206892 ; for termini ACE & CT3, RTU, Mar 2014
+MCH3     NH1   2    0.195883 ; for termini ACE & CT3, RTU, Mar 2014
+#else
+; no heavy hydrogens.
+; constraints for the rigid NH3 groups
+MNH3    CTL2   2    0.159603 ; for lipid v-sites, RTU, Feb 2014
+; constraints for rigid ch3
+MCH3       C   2    0.168122 ; for termini ACE & CT3, RTU, Mar 2014
+MCH3     NH1   2    0.159176 ; for termini ACE & CT3, RTU, Mar 2014
+MCH3     CTL2  2    0.167162 ; for lipid v-sites, RTU, Feb 2014
+MCH3     CTL3  2    0.167354 ; for lipid v-sites, RTU, Feb 2014
+#endif
+; angle-derived constraints for OH and SH groups in proteins
+; The constraint A-C is calculated from the angle A-B-C and bonds A-B, B-C.
+CTL1   HAL1   2     0.192081 ; for lipid v-sites, RTU, Feb 2014
+CTL2   HAL2   2     0.192081 ; for lipid v-sites, RTU, Feb 2014
+CTL3   HAL3   2     0.192081 ; for lipid v-sites, RTU, Feb 2014
+; for phosphrylated aminoacids, RTU, Mar 2014 
+P       HN4   2     0.216796
+
+; include protein chain topologies
+#include "TehA.Protein-noexcl.itp"
+
+; include lipid topology
+#include "POPE-noexcl.itp"
+
+; Include water topology
+#include "tip4p-noexcl.itp"
+
+; Include topology for ions
+#include "charmm27.ff/ions.itp"
+
+[ system ]
+; Name
+TehA anion channel in a POPE membrane, solvent: water, Na+, Cl-
+
+[ molecules ]
+; Compound #
+Protein             3
+POPE              432
+SOL             52943
+NA                141
+CL                162
