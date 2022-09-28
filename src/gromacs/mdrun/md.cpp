@@ -99,6 +99,9 @@
 #include "gromacs/mdlib/update_constrain_cuda.h"
 #include "gromacs/mdlib/vcm.h"
 #include "gromacs/mdlib/vsite.h"
+// MICHELE: add include for the flow code
+#include "gromacs/mdlib/md_petter.h"
+/* ********************* */
 #include "gromacs/mdrunutility/handlerestart.h"
 #include "gromacs/mdrunutility/multisim.h"
 #include "gromacs/mdrunutility/printtime.h"
@@ -627,6 +630,21 @@ void gmx::LegacySimulator::do_md()
     bExchanged       = FALSE;
     bNeedRepartition = FALSE;
 
+    // PETTER
+    // Prepare for (optional) flow field output by setting up the container
+    // and reading all parameter values.
+    FlowData flowcr;
+
+    if (opt2bSet("-flow", nfile, fnm))
+    {
+        flowcr = init_flow_container(nfile, fnm, ir, groups, state);
+
+        if (MASTER(cr))
+        {
+            print_flow_collection_information(flowcr, ir->delta_t);
+        }
+    }
+
     bool simulationsShareState = false;
     int  nstSignalComm         = nstglobalcomm;
     {
@@ -818,7 +836,18 @@ void gmx::LegacySimulator::do_md()
         }
         clear_mat(force_vir);
 
-        checkpointHandler->decideIfCheckpointingThisStep(bNS, bFirstStep, bLastStep);
+        // PETTER
+        // Add condition for checkpointing only on flow map output step. This is because we do 
+        // not save any data from the flow maps in a checkpoint, so if we resume from a checkpoint 
+        // in between output steps, all data since the last output has been lost. By only checkpointing
+        // at flow output steps we do not throw away any data.
+        const bool bFlowOutputThisStep = flowcr.bDoFlowCollection ? (step % flowcr.step_output) == 0 : true;
+        checkpointHandler->decideIfCheckpointingThisStep(bNS, bFirstStep, bLastStep, bFlowOutputThisStep);
+
+        /* MICHELE:
+         * Old checkpoit handler, now the flow code takes care of that
+         */
+        // checkpointHandler->decideIfCheckpointingThisStep(bNS, bFirstStep, bLastStep);
 
         /* Determine the energy and pressure:
          * at nstcalcenergy steps and at energy output steps (set below).
@@ -1517,6 +1546,12 @@ void gmx::LegacySimulator::do_md()
 
         bFirstStep             = FALSE;
         bInitStep              = FALSE;
+
+        // PETTER
+        if (flowcr.bDoFlowCollection && do_per_step(step, flowcr.step_collect))
+        {
+            flow_collect_or_output(flowcr, step, cr, ir, mdatoms, state, groups);
+        }
 
         /* #######  SET VARIABLES FOR NEXT ITERATION IF THEY STILL NEED IT ###### */
         /* With all integrators, except VV, we need to retain the pressure
